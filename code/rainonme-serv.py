@@ -44,7 +44,7 @@ our_locations=station_info['location']
 
 d,x,y=[],[],[]
 x1 = 0.0
-key = 'Your key here'
+
 for day in range(4,-1,-1):
    url = ''.join(['http://api.wunderground.com/api/', our_key, '/history_', (now-timedelta(days=day)).strftime('%Y%m%d'), '/q/TX/Addison.json'])
    data = download_json(url)
