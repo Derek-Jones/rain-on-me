@@ -49,6 +49,10 @@ def rain_prediction():
    london_f = open('../data/london-station.json')
    london_station=london_f.read()
 
+# Find nearest station to us
+   closest=99999
+   for l_s in london_station:
+
 # http://www.wunderground.com/weatherstation/WXDailyHistory.asp?ID=KCASANTE9&graphspan=month&month=10&day=1&year=2012&format=1
 
 
@@ -65,6 +69,7 @@ def rain_prediction():
 #         x.append(x1 + float(k['date']['hour'])+ round((float(k['date']['min'])/60.0),2))
 #      y.append(y0)
 
+# Test data
    rain_f = open('../data/rainonme.json')
    rain_pred=rain_f.read()
    return rain_pred
