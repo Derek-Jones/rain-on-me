@@ -60,7 +60,7 @@ def blow_weather(cur_lat_long, wind_dir, london_station):
       if (c_dist < cur_min_station_dist):
          cur_min_station_dist=c_dist
          weather_station=l_s
-   return []
+   return weather_station
 
 def rain_prediction():
 
@@ -133,7 +133,7 @@ def rain_prediction():
    rain_f.close()
 
 # Make the json data a viable javascript assignment!!!
-   r_str=''.join(['var data=', json.dumps(rain_pred), ';'])
+   r_str=''.join(['plotData(', json.dumps(rain_pred), ');'])
    return r_str
 
 if __name__ == '__main__':
