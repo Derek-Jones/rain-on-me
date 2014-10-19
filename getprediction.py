@@ -1,22 +1,30 @@
 #
-# raininme-serv.py, 18 Oct 14
+# getprediction.py, 18 Oct 2014
 #
 
+import logging
+from google.appengine.ext import webapp
+from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import RequestHandler
 import json
 from json import loads
 from urllib2 import urlopen
 from datetime import datetime, date, timedelta
+
+class GetPrediction(RequestHandler):
+    def get(self):
+        lat = float(self.request.get('lat'))
+        lon = float(self.request.get('lon'))
+#        lat = 51.508907
+#        lon = -0.084054
+        logging.info('Forecast for (%sN,%sE)', lat, lon)
+        self.response.out.write(rain_prediction(lat, lon))
 
 def download_json(url):
    weather = urlopen(url)
    string = weather.read()
    weather.close()
    return loads(string)
-
-def get_cur_location():
-# Current location
-# The client passes us current lat/long, hard code TechCrunch dungeon location for now
-   return [51.508907, -0.084054]
 
 # See: http://www.gamedev.net/topic/489006-2d-distance-from-a-point-to-a-line-segment/
 # for details of following calculation
@@ -62,11 +70,8 @@ def blow_weather(cur_lat_long, wind_dir, london_station):
          weather_station=l_s
    return weather_station
 
-def rain_prediction():
+def rain_prediction(cur_lat, cur_lon):
 
-   cur_lat_long=get_cur_location()
-   cur_lat=cur_lat_long[0]
-   cur_long=cur_lat_long[1]
    date_time=date.today()
 
 # Not our actual key, don't want that to appear on github
@@ -90,7 +95,7 @@ def rain_prediction():
 
 # Save on our daily limit of API calls by reusing data that is unlikely to change
 
-   london_f = open('../data/london-station.json')
+   london_f = open('data/london-station.json')
    london_station=json.load(london_f)
    london_f.close()
 
@@ -116,14 +121,19 @@ def rain_prediction():
 
 #   x,y=[],[]
 #
-#   wdata_url = ''.join(['http://api.wunderground.com/api/', our_key, '/history_', date_time.strftime('%Y%m%d'), '/q/', rain_from['id'], '.json'])
-#   wdata = download_json(wdata_url)
+#   data_url = ''.join(['http://api.wunderground.com/api/', our_key, '/history_', date_time.strftime('%Y%m%d'), '/q/TX/Addison.json'])
+#   data = download_json(data_url)
 #
-
-# Now we need to calculate what the 'future' of the rain data we have
+#   for k in data['history']['observations']:
+#      y0 = float(k['pressurem'])
+#      if y0 < 0.0:
+#         continue
+#      else:
+#         x.append(x1 + float(k['date']['hour'])+ round((float(k['date']['min'])/60.0),2))
+#      y.append(y0)
 
 # Test data
-   rain_f = open('../data/rainonme.json')
+   rain_f = open('data/rainonme.json')
    rain_pred=json.load(rain_f)
    rain_f.close()
 
@@ -131,6 +141,13 @@ def rain_prediction():
    r_str=''.join(['plotData(', json.dumps(rain_pred), ');'])
    return r_str
 
+
+
+application = webapp.WSGIApplication([('/getprediction', GetPrediction),
+                                     ], debug=True)
+
+def main():
+    run_wsgi_app(application)
+
 if __name__ == '__main__':
-   t=rain_prediction()
-   print t
+    main()
