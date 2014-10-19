@@ -15,6 +15,7 @@ class GetPrediction(RequestHandler):
     def get(self):
         lat = float(self.request.get('lat'))
         lon = float(self.request.get('lon'))
+# The client passes us current lat/long, values for TechCrunch dungeon location
 #        lat = 51.508907
 #        lon = -0.084054
         logging.info('Forecast for (%sN,%sE)', lat, lon)
@@ -116,28 +117,27 @@ def rain_prediction(cur_lat, cur_lon):
 
 # Find station(s) from where the wind is blowing the rain our way
    # wind_dir=closest_data['wind_dir']
+   # wind_speed=closest_data['wind_speed']
 
    # rain_from=blow_weather(cur_lat_long, wind_dir, london_station)
 
-#   x,y=[],[]
 #
-#   data_url = ''.join(['http://api.wunderground.com/api/', our_key, '/history_', date_time.strftime('%Y%m%d'), '/q/TX/Addison.json'])
-#   data = download_json(data_url)
+#   wdata_url = ''.join(['http://api.wunderground.com/api/', our_key, '/history_', date_time.strftime('%Y%m%d'), '/q/', rain_from['id'], '.json'])
+#   wdata = download_json(wdata_url)
 #
-#   for k in data['history']['observations']:
-#      y0 = float(k['pressurem'])
-#      if y0 < 0.0:
-#         continue
-#      else:
-#         x.append(x1 + float(k['date']['hour'])+ round((float(k['date']['min'])/60.0),2))
-#      y.append(y0)
+# Now we need to calculate the 'future' of the rain data we have
+# Distance in miles (0.62.. convert earth radius in km to miles) to station
+   w_dist=(pi*6371/180)*0.621371192*
+          math.sqrt(math.pow(cur_lat-closest_station['Lat'], 2)+
+                    math.pow(cur_long-closest_station['Long'], 2))
+   time_to_here=wind_speed/w_dist
 
 # Test data
    rain_f = open('data/rainonme.json')
    rain_pred=json.load(rain_f)
    rain_f.close()
 
-# Make the json data a viable javascript assignment!!!
+# Make the json data a viable javascript function call!!!
    r_str=''.join(['plotData(', json.dumps(rain_pred), ');'])
    return r_str
 

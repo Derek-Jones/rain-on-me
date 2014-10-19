@@ -114,7 +114,6 @@ def rain_prediction():
 
    # rain_from=blow_weather(cur_lat_long, wind_dir, london_station)
 
-#   x,y=[],[]
 #
 #   wdata_url = ''.join(['http://api.wunderground.com/api/', our_key, '/history_', date_time.strftime('%Y%m%d'), '/q/', rain_from['id'], '.json'])
 #   wdata = download_json(wdata_url)
