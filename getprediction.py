@@ -9,13 +9,12 @@ from google.appengine.ext.webapp import RequestHandler
 import json
 from json import loads
 from urllib2 import urlopen
-from datetime import datetime, date, timedelta
+from datetime import date
 
 class GetPrediction(RequestHandler):
     def get(self):
         lat = float(self.request.get('lat'))
         lon = float(self.request.get('lon'))
-# The client passes us current lat/long, values for TechCrunch dungeon location
 #        lat = 51.508907
 #        lon = -0.084054
         logging.info('Forecast for (%sN,%sE)', lat, lon)
@@ -37,7 +36,9 @@ def blow_weather(cur_lat_long, wind_dir, london_station):
    wind_from=(wind_dir+180) % 360
 # degrees to km given by pi*6371/180, about 111km per degree
 # assume strations within 55km, so 0.5 degree
-   max_add_lonf=0.5
+# This will change for longitude (because it is not a great circle) as latitude changes
+# assume a linear relationship
+   max_add_lonf=0.5*(1-51/90)
 # Now calculate latitude offset for each quadrant
    if (wind_from < 90):
       add_long=max_add_long
@@ -71,7 +72,7 @@ def blow_weather(cur_lat_long, wind_dir, london_station):
          weather_station=l_s
    return weather_station
 
-def rain_prediction(cur_lat, cur_lon):
+def rain_prediction(cur_lat, cur_long):
 
    date_time=date.today()
 
@@ -104,6 +105,7 @@ def rain_prediction(cur_lat, cur_lon):
    cur_closest=99999
    close_station=[]
    for l_s in london_station:
+      logging.info('Weather station (%sN,%sE) nearby', l_s['Lat'], l_s['Long'])
       s_dist=abs(cur_lat-l_s['Lat'])+abs(cur_long-l_s['Long'])
       if (s_dist < cur_closest):
          cur_closest=s_dist
@@ -137,7 +139,7 @@ def rain_prediction(cur_lat, cur_lon):
    rain_pred=json.load(rain_f)
    rain_f.close()
 
-# Make the json data a viable javascript function call!!!
+# Make the json data a viable javascript assignment!!!
    r_str=''.join(['plotData(', json.dumps(rain_pred), ');'])
    return r_str
 
