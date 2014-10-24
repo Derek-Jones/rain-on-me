@@ -35,10 +35,10 @@ def perp_dist(l_s, A_v, p_vec_lat, p_vec_long):
 def blow_weather(cur_lat_long, wind_dir, london_station):
    wind_from=(wind_dir+180) % 360
 # degrees to km given by pi*6371/180, about 111km per degree
-# assume strations within 55km, so 0.5 degree
+# assume stations within 55km, so 0.5 degree
 # This will change for longitude (because it is not a great circle) as latitude changes
 # assume a linear relationship
-   max_add_lonf=0.5*(1-51/90)
+   max_add_long=0.5
 # Now calculate latitude offset for each quadrant
    if (wind_from < 90):
       add_long=max_add_long
@@ -52,6 +52,9 @@ def blow_weather(cur_lat_long, wind_dir, london_station):
    else:
       add_long=-max_add_long
       add_lat=max_add_long/tan((wind_from-270)*pi/180)
+# Longitude is not a great circle, so will change as latitude changes
+# assume a linear relationship
+   add_long*=(1-51/90)
 # End points of line along which the wind blows
    a_lat=cur_lat_long[0]
    a_long=cur_lat_long[1]
@@ -73,12 +76,10 @@ def blow_weather(cur_lat_long, wind_dir, london_station):
    return weather_station
 
 def rain_prediction(cur_lat, cur_long):
-
    date_time=date.today()
 
 # Not our actual key, don't want that to appear on github
    our_key='485014baf636a61b'
-
 
 # Get list of weather stations around us
 # Example from wunderground doc
@@ -133,6 +134,7 @@ def rain_prediction(cur_lat, cur_long):
           math.sqrt(math.pow(cur_lat-closest_station['Lat'], 2)+
                     math.pow(cur_long-closest_station['Long'], 2))
    time_to_here=wind_speed/w_dist
+# Where is the rain data you ask....
 
 # Test data
    rain_f = open('data/rainonme.json')
